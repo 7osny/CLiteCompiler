@@ -10,27 +10,27 @@ import static java.lang.System.exit;
 public class TokensScanner {
 
 
-    static ArrayList<String> reservedWords = new ArrayList<>();
-    static ArrayList<String> parenthes = new ArrayList<>();
-    static ArrayList<String> specialSymbols = new ArrayList<>();
-    static ArrayList<String> operators = new ArrayList<>();
-    static ArrayList<String> typeSpecifiers = new ArrayList<>();
-    static ArrayList<String> resultingfloats = new ArrayList<>();
-    static ArrayList<String> resultingints = new ArrayList<>();
-    static ArrayList<String> resultingids = new ArrayList<>();
-    static ArrayList<String> resultingops = new ArrayList<>();
-    static ArrayList<String> resultingreserved = new ArrayList<>();
-    static ArrayList<String> resultingParenthese = new ArrayList<>();
-    static ArrayList<String> resultingspecialChars = new ArrayList<>();
-    static ArrayList<String> resultingInvadlidTokens = new ArrayList<>();
-    static ArrayList<String> resultingTypeSpecifiers = new ArrayList<>();
-    static ArrayList<String> resultingChars = new ArrayList<>();
-    static ArrayList<String> resultingBools = new ArrayList<>();
-    static ArrayList<String> resultingLiterals = new ArrayList<>();
-    static ArrayList<Token> tokenes = new ArrayList<>();
+     ArrayList<String> reservedWords = new ArrayList<>();
+     ArrayList<String> parenthes = new ArrayList<>();
+     ArrayList<String> specialSymbols = new ArrayList<>();
+     ArrayList<String> operators = new ArrayList<>();
+     ArrayList<String> typeSpecifiers = new ArrayList<>();
+     ArrayList<String> resultingfloats = new ArrayList<>();
+     ArrayList<String> resultingints = new ArrayList<>();
+     ArrayList<String> resultingids = new ArrayList<>();
+     ArrayList<String> resultingops = new ArrayList<>();
+     ArrayList<String> resultingreserved = new ArrayList<>();
+     ArrayList<String> resultingParenthese = new ArrayList<>();
+     ArrayList<String> resultingspecialChars = new ArrayList<>();
+     ArrayList<String> resultingInvadlidTokens = new ArrayList<>();
+     ArrayList<String> resultingTypeSpecifiers = new ArrayList<>();
+     ArrayList<String> resultingChars = new ArrayList<>();
+     ArrayList<String> resultingBools = new ArrayList<>();
+     ArrayList<String> resultingLiterals = new ArrayList<>();
+     ArrayList<Token> tokenes = new ArrayList<>();
 
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public void start() throws FileNotFoundException {
         initializeThings();
         Scanner sysin = new Scanner(System.in);
 
@@ -105,7 +105,7 @@ public class TokensScanner {
 
     }
 
-    private static void longestMatch(String word) {
+    private  void longestMatch(String word) {
         int id = 0;
         String invalidChars = "";
         //int reserved=-1;
@@ -172,7 +172,7 @@ public class TokensScanner {
         }
     }
 
-    private static void swapAndAdd(String invalidChars) {
+    private  void swapAndAdd(String invalidChars) {
         Token token = tokenes.get(tokenes.size() - 1);
         tokenes.remove(tokenes.size() - 1);
         addInProberList(invalidChars, TokenType.Invalid);
@@ -180,7 +180,7 @@ public class TokensScanner {
     }
 
 
-    private static void addInProberList(String word, TokenType tokenType) {
+    private  void addInProberList(String word, TokenType tokenType) {
         //Reserved, Operator, Literal, Identifier, Parenthese, SpecialSymbol
         switch (tokenType) {
             case Invalid:
@@ -233,7 +233,7 @@ public class TokensScanner {
         }
     }
 
-    private static void ReservedOrId(String word) {
+    private  void ReservedOrId(String word) {
         if (reservedWords.contains(word)) {
             //  resultingreserved.add(word);
             addInProberList(word, TokenType.Reserved);
@@ -245,7 +245,7 @@ public class TokensScanner {
         }
     }
 
-    private static void PrintLists() {
+    private  void PrintLists() {
         // System.out.println("resulting float :: " + resultingfloats);
         // System.out.println("resulting ints :: " + resultingints);
         //  System.out.println("resulting chars :: " + resultingChars);
@@ -263,7 +263,7 @@ public class TokensScanner {
     }
 
 
-    private static void initializeThings() {
+    private  void initializeThings() {
 
         reservedWords.add("if");
         reservedWords.add("else");
@@ -301,7 +301,7 @@ public class TokensScanner {
 
     }
 
-    static boolean checkInteger(String str) {
+     boolean checkInteger(String str) {
         for (int i = 0; i < str.length(); i++) {
             if (str.charAt(i) < '0' || str.charAt(i) > '9')
                 return false;
@@ -312,7 +312,7 @@ public class TokensScanner {
 
     }
 
-    static boolean checkFloat(String str) {
+     boolean checkFloat(String str) {
 
 
         if (!str.contains("."))
@@ -327,7 +327,7 @@ public class TokensScanner {
 
     }
 
-    static boolean checkChar(String str) {
+     boolean checkChar(String str) {
         if (str.length() != 3)
             return false;
         char[] arr = str.toCharArray();
@@ -335,13 +335,13 @@ public class TokensScanner {
 
     }
 
-    static boolean checkBoolean(String str) {
+     boolean checkBoolean(String str) {
         return str.equals("true") || str.equals("false");
 
 
     }
 
-    static boolean checkID(String str) {
+     boolean checkID(String str) {
         if (!isLetter(str.charAt(0))) {
             return false;
         }
@@ -353,7 +353,7 @@ public class TokensScanner {
 
     }
 
-    static boolean isLetter(char ch) {
+     boolean isLetter(char ch) {
         if ((ch <= 'Z' && ch >= 'A') || ((ch <= 'z' && ch >= 'a')))
             return true;
         return false;
