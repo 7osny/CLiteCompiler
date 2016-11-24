@@ -9,7 +9,7 @@ import static java.lang.System.exit;
 
 public class TokensScanner {
 
-
+     static int lineNum=0;
      ArrayList<String> reservedWords = new ArrayList<>();
      ArrayList<String> parenthes = new ArrayList<>();
      ArrayList<String> specialSymbols = new ArrayList<>();
@@ -30,19 +30,9 @@ public class TokensScanner {
      ArrayList<Token> tokenes = new ArrayList<>();
 
 
-    public void start() throws FileNotFoundException {
+    public void startScanning(File file) throws FileNotFoundException {
         initializeThings();
-        Scanner sysin = new Scanner(System.in);
-
-        System.out.print("Enter Src file path :: ");
-        String path = sysin.nextLine();
-        //if(new File(path))
-        File file = new File(path);
-        if (!file.exists()) {
-            System.out.println("Wrong File Path");
-            exit(0);
-        }
-
+        lineNum=1;
         Scanner input = new Scanner(file);
 
         while (input.hasNext()) {
@@ -86,7 +76,10 @@ public class TokensScanner {
                     longestMatch(word);
                 }
             }
+            lineNum++;
         }
+        tokenes.add(new Token(TokenType.EOF,"",lineNum));
+
   /*      for (int i = 0; i < resultingInvadlidTokens.size(); i++) {
             String str = resultingInvadlidTokens.get(i);
             if (checkFloat(str)) {
@@ -100,11 +93,13 @@ public class TokensScanner {
 
             }
         }*/
-        PrintLists();
+
 
 
     }
-
+   public ArrayList<Token> getTokenes(){
+       return  tokenes;
+   }
     private  void longestMatch(String word) {
         int id = 0;
         String invalidChars = "";
@@ -194,40 +189,40 @@ public class TokensScanner {
                     resultingBools.add(word); */
                 if (checkFloat(word) || checkChar(word) || checkBoolean(word) || checkInteger(word)) {
                     resultingLiterals.add(word);
-                    tokenes.add(new Token(TokenType.Literal, word));
+                    tokenes.add(new Token(TokenType.Literal, word,lineNum));
                     break;
                 } else {
                     resultingInvadlidTokens.add(word);
-                    tokenes.add(new Token(tokenType, word));
+                    tokenes.add(new Token(tokenType, word,lineNum));
                     break;
                 }
 
             case Reserved:
-                tokenes.add(new Token(tokenType, word));
+                tokenes.add(new Token(tokenType, word,lineNum));
                 resultingreserved.add(word);
                 break;
             case Operator:
-                tokenes.add(new Token(tokenType, word));
+                tokenes.add(new Token(tokenType, word,lineNum));
                 resultingops.add(word);
                 break;
             case Literal:
-                tokenes.add(new Token(tokenType, word));
+                tokenes.add(new Token(tokenType, word,lineNum));
                 resultingLiterals.add(word);
                 break;
             case Identifier:
-                tokenes.add(new Token(tokenType, word));
+                tokenes.add(new Token(tokenType, word,lineNum));
                 resultingids.add(word);
                 break;
             case Parenthese:
-                tokenes.add(new Token(tokenType, word));
+                tokenes.add(new Token(tokenType, word,lineNum));
                 resultingParenthese.add(word);
                 break;
             case SpecialSymbol:
-                tokenes.add(new Token(tokenType, word));
+                tokenes.add(new Token(tokenType, word,lineNum));
                 resultingspecialChars.add(word);
                 break;
             case TypeSpecifier:
-                tokenes.add(new Token(tokenType, word));
+                tokenes.add(new Token(tokenType, word,lineNum));
                 resultingTypeSpecifiers.add(word);
 
         }
@@ -245,7 +240,7 @@ public class TokensScanner {
         }
     }
 
-    private  void PrintLists() {
+    public  void printLists() {
         // System.out.println("resulting float :: " + resultingfloats);
         // System.out.println("resulting ints :: " + resultingints);
         //  System.out.println("resulting chars :: " + resultingChars);
@@ -301,7 +296,7 @@ public class TokensScanner {
 
     }
 
-     boolean checkInteger(String str) {
+    static boolean checkInteger(String str) {
         for (int i = 0; i < str.length(); i++) {
             if (str.charAt(i) < '0' || str.charAt(i) > '9')
                 return false;
@@ -312,7 +307,7 @@ public class TokensScanner {
 
     }
 
-     boolean checkFloat(String str) {
+     static boolean checkFloat(String str) {
 
 
         if (!str.contains("."))
@@ -327,7 +322,7 @@ public class TokensScanner {
 
     }
 
-     boolean checkChar(String str) {
+    static boolean checkChar(String str) {
         if (str.length() != 3)
             return false;
         char[] arr = str.toCharArray();
@@ -335,7 +330,7 @@ public class TokensScanner {
 
     }
 
-     boolean checkBoolean(String str) {
+   static  boolean checkBoolean(String str) {
         return str.equals("true") || str.equals("false");
 
 
