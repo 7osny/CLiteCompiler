@@ -1,0 +1,47 @@
+
+// first test case (ideal case)
+int main () {
+}
+
+// Second test case
+int x; (without enclosing this statement in main function the expected result is error(
+
+//  test case 3  accepted
+int main () {
+int x;
+}
+
+// test case 4  accepted
+
+int main (){
+;
+}
+
+//test case 5  error
+ int main(){
+1
+}
+
+//test case 6  error
+int main(){
+x int ;
+}
+
+// test case 7  error
+ int main(){
+int;
+}
+
+// test case 8 -> accept
+
+
+int main()
+{
+int x;
+int y;
+int result;
+
+x = 5;
+y = 2;
+result = x*y;
+}
