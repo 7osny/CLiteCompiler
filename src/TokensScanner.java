@@ -41,7 +41,12 @@ public class TokensScanner {
                 if (checkFloat(arr.get(i))) {
                     //  resultingfloats.add(arr.get(i));
                     addInProberList(arr.get(i), TokenType.Literal);
-                } else if (checkInteger(arr.get(i))) {
+                }else if (checkBoolean(arr.get(i))) {
+                    // resultingBools.add(arr.get(i));
+                    addInProberList(arr.get(i), TokenType.Literal);
+
+                }
+                else if (checkInteger(arr.get(i))) {
                     //resultingints.add(arr.get(i));
                     addInProberList(arr.get(i), TokenType.Literal);
                 } else if (specialSymbols.indexOf(arr.get(i)) >= 0) {
@@ -50,10 +55,6 @@ public class TokensScanner {
 
                 } else if (checkChar(arr.get(i))) {
                     // resultingChars.add(arr.get(i));
-                    addInProberList(arr.get(i), TokenType.Literal);
-
-                } else if (checkBoolean(arr.get(i))) {
-                    // resultingBools.add(arr.get(i));
                     addInProberList(arr.get(i), TokenType.Literal);
 
                 } else if (reservedWords.indexOf(arr.get(i)) >= 0) {
@@ -94,7 +95,7 @@ public class TokensScanner {
             }
         }*/
 
-
+        System.out.println("Lexical Analysis has finished successfully...");
 
     }
    public ArrayList<Token> getTokenes(){
@@ -229,7 +230,10 @@ public class TokensScanner {
     }
 
     private  void ReservedOrId(String word) {
-        if (reservedWords.contains(word)) {
+        if(checkBoolean(word)){
+            addInProberList(word, TokenType.Literal);
+        }
+        else if (reservedWords.contains(word)) {
             //  resultingreserved.add(word);
             addInProberList(word, TokenType.Reserved);
         } else if (typeSpecifiers.contains(word)) {
@@ -279,6 +283,7 @@ public class TokensScanner {
         operators.add("<");
         operators.add("+");
         operators.add("-");
+        operators.add("!");
         operators.add("*");
         operators.add("/");
         operators.add("&&");

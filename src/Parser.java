@@ -1,4 +1,4 @@
-import com.sun.org.apache.xpath.internal.SourceTree;
+
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -13,92 +13,110 @@ public class Parser {
     Queue<Token> tokenes;
     Token currentToken;
 
-    public void startParsing(ArrayList<Token> resultingTokens) {
+    public ParsingTree startParsing(ArrayList<Token> resultingTokens) {
         tokenes = new LinkedList<>(resultingTokens);
         currentToken = tokenes.poll();
 
 
-
-        program();
-        if(currentToken.getType()==TokenType.EOF){
-            System.out.println("Parsing has finished successfully");
+        ParsingTree.Node node = new ParsingTree.Node("Start");
+        node.add(program());
+        if (currentToken.getType() == TokenType.EOF) {
+            System.out.println("Parsing has finished successfully....");
         }
+        node.display();
+      //  System.out.println(ParsingTree.getLeafNodes(node));
+       // System.out.println(ParsingTree.getNodes(node,"deceleration"));
+        ParsingTree pt = new ParsingTree(node);
+//        SemanticsAnalyzer sa=new SemanticsAnalyzer(pt);
+//        sa.declaration(ParsingTree.getNodes(node,"deceleration").get(0));
+//        sa.declaration(ParsingTree.getNodes(node,"deceleration").get(1));
+        return pt;
     }
-    // Program   int main () { Declarations Statements }
-    private void program() {
-        match("int");
-        match("main");
-        match("(");
-        match(")");
-        match("{");
-        declerations();
-        statements();
-        match("}");
 
+    // Program   int main () { Declarations Statements }
+    private ParsingTree.Node program() {
+        ParsingTree.Node node = new ParsingTree.Node("Program");
+        node.add(match("int"));
+        node.add(match("main"));
+        node.add(match("("));
+        node.add(match(")"));
+        node.add(match("{"));
+        node.add(decelerations());
+        node.add(statements());
+        node.add(match("}"));
+        return node;
     }
 
     //Declarations  { Declaration }
 
 
-    private void declerations() {
+    private ParsingTree.Node decelerations() {
+        ParsingTree.Node node = new ParsingTree.Node("decelerations");
         while (currentToken.getType() == TokenType.TypeSpecifier) {
-            decleration();
+            node.add(deceleration());
         }
+        return node;
     }
-    //Declaration  Type Identifier [ [ Integer ] ] { , Identifier [ [ Integer ] ] }
-    private void decleration() {
-        match(TokenType.TypeSpecifier);
-        match(TokenType.Identifier);
-        while (currentToken.getValue().equals(",")) {
-            match(",");
-            match(TokenType.Identifier);
-            if (currentToken.getType()==TokenType.Parenthese) {
 
-                    match("[");
-                    if (TokensScanner.checkInteger(currentToken.getValue()))
-                        match(TokenType.Literal);
-                    else
-                        showError();
-                    match("]");
+    //Declaration  Type Identifier [ [ Integer ] ] { , Identifier [ [ Integer ] ] ; }
+    //Declaration  Type Identifier { , Identifier } ;
+    private ParsingTree.Node deceleration() {
+        ParsingTree.Node node = new ParsingTree.Node("deceleration");
+        node.add(match(TokenType.TypeSpecifier));
+        node.add(match(TokenType.Identifier));
+        while (currentToken.getValue().equals(",")) {
+            node.add(match(","));
+            node.add(match(TokenType.Identifier));
+            if (currentToken.getType() == TokenType.Parenthese) {
+
+                node.add(match("["));
+                if (TokensScanner.checkInteger(currentToken.getValue()))
+                    node.add(match(TokenType.Literal));
+                else
+                    showError();
+                node.add(match("]"));
             }
         }
-        match(";");
+        node.add(match(";"));
+        return node;
     }
     //  Statements  {  Statement  }
 
 
-    private void statements() {
-       // match("{");
-        while(currentToken.getValue().equals(";")
-                ||currentToken.getValue().equals("{")
-                ||currentToken.getType()==TokenType.Identifier
-                ||currentToken.getValue().toLowerCase().equals("if")
-                ||currentToken.getValue().toLowerCase().equals("while") )
-        {
-        statement();
+    private ParsingTree.Node statements() {
+        ParsingTree.Node node = new ParsingTree.Node("statements");
+        // match("{");
+        while (currentToken.getValue().equals(";")
+                || currentToken.getValue().equals("{")
+                || currentToken.getType() == TokenType.Identifier
+                || currentToken.getValue().toLowerCase().equals("if")
+                || currentToken.getValue().toLowerCase().equals("while")) {
+            node.add(statement());
         }
-      //  match("}");
-
+        //  match("}");
+        return node;
     }
-    //  Statement  ; | Block; | Assignment;| IfStatement; | WhileStatement;
+    //  Statement  ; | Block | Assignment;| IfStatement | WhileStatement
 
-    private void statement() {
+    private ParsingTree.Node statement() {
+        ParsingTree.Node node = new ParsingTree.Node("statement");
         switch (currentToken.getType()) {
             case SpecialSymbol:
-                //match(";");
+                node.add(match(";"));
                 break;
             case Parenthese://Block match
-                block();
+                node.add(block());
                 break;
             case Identifier:  //assignment match
-                assignment();
+                node.add(assignment());
+                node.add(match(";"));
                 break;
             case Reserved:
                 if (currentToken.getValue().toLowerCase().equals("if"))
-                    ifStatement();
+                    node.add(ifStatement());
 
                 else if (currentToken.getValue().toLowerCase().equals("while"))
-                    whileStatement();
+                    node.add(whileStatement());
                 else
                     showError();
                 break;
@@ -106,101 +124,138 @@ public class Parser {
             default:
                 showError();
         }
-        match(";");
+        // match(";");
+        return node;
     }
-    //  Block  { Statements }
-    private void block() {
-        while(currentToken.getValue()=="{")
-            statements();
+
+    //  Block  { Statements }||;
+    private ParsingTree.Node block() {
+        ParsingTree.Node node = new ParsingTree.Node("block");
+        if (currentToken.getValue().equals(";")) {
+            node.add(match(";"));
+        } else if (currentToken.getValue().equals("{")) {
+            while (currentToken.getValue().equals("{")) {
+                node.add(match("{"));
+                node.add(statements());
+                node.add(match("}"));
+            }
+        }
+        return node;
     }
 
     //  Assignment  Identifier [ [ Expression ] ] = Expression;
-    private void assignment() {
-        match(TokenType.Identifier);
+    private ParsingTree.Node assignment() {
+        ParsingTree.Node node = new ParsingTree.Node("assignment");
+        node.add(match(TokenType.Identifier));
         if (currentToken.getValue().equals("[")) {
-            match("[");
-            expression();
-            match("]");
+            node.add(match("["));
+            node.add(expression());
+            node.add(match("]"));
 
         }
-        match("=");
-        expression();
+        node.add(match("="));
+        node.add(expression());
+        return node;
     }
 
     //   WhileStatement  while ( Expression ) Statement
-    private void whileStatement() {
-        match("while");
-        match("(");
-        expression();
-        match(")");
-        statement();
+    private ParsingTree.Node whileStatement() {
+        ParsingTree.Node node = new ParsingTree.Node("whileStatement");
+        node.add(match("while"));
+        node.add(match("("));
+        node.add(expression());
+        node.add(match(")"));
+        node.add(statement());
+        return node;
     }
+
     //   IfStatement  if ( Expression ) Statement [ else Statement ]
-    private void ifStatement() {
-        match("if");
-        match("(");
-        expression();
-        match(")");
-        statement();
-        if(currentToken.getValue()=="else"){
-            match("else");
-            statement();
+    private ParsingTree.Node ifStatement() {
+        ParsingTree.Node node = new ParsingTree.Node("ifStatement");
+        node.add(match("if"));
+        node.add(match("("));
+        node.add(expression());
+        node.add(match(")"));
+        node.add(statement());
+        if (currentToken.getValue().equals( "else")) {
+            node.add(match("else"));
+            node.add(statement());
         }
+        return node;
     }
-//Expression  Conjunction { || Conjunction }
-    private void expression() {
-        conjunction();
+
+    //Expression  Conjunction { || Conjunction }
+    private ParsingTree.Node expression() {
+        ParsingTree.Node node = new ParsingTree.Node("expression");
+        node.add(conjunction());
         while (currentToken.getValue().equals("||")) {
-            match("||");
-            conjunction();
+            node.add(match("||"));
+            node.add(conjunction());
         }
+        return node;
     }
 
 
-
-//Conjunction  Equality { && Equality }
-    private void conjunction() {
-        equality();
+    //Conjunction  Equality { && Equality }
+    private ParsingTree.Node conjunction() {
+        ParsingTree.Node node = new ParsingTree.Node("conjunction");
+        node.add(equality());
         while (currentToken.getValue().equals("&&")) {
-            match("&&");
-            equality();
+            node.add(match("&&"));
+            node.add(equality());
         }
+        return node;
     }
+
     //Equality  Relation [ EquOp Relation ]
-    private void equality() {
-        relation();
+    private ParsingTree.Node equality() {
+        ParsingTree.Node node = new ParsingTree.Node("equality");
+        node.add(relation());
 
         if (equOp()) {
-            match(TokenType.Operator);
-            relation();
+            ParsingTree.Node eqNode=new ParsingTree.Node(("equOp"));
+            eqNode.add(match(TokenType.Operator));
+            node.add(eqNode);
+            node.add(relation());
+
         }
+        return node;
     }
+
     //EquOp  == | !=
     private boolean equOp() {
         return currentToken.getValue().equals("==") || currentToken.getValue().equals("!=");
     }
 
     // Relation   Addition [ RelOp Addition]
-    private void relation() {
-        addition();
+    private ParsingTree.Node relation() {
+        ParsingTree.Node node = new ParsingTree.Node("relation");
+        node.add(addition());
         if (relOp()) {
-            match(TokenType.Operator);
-            addition();
+            ParsingTree.Node relNode=new ParsingTree.Node(("relOp"));
+            relNode.add(match(TokenType.Operator));
+            node.add(relNode);
+            node.add(addition());
 
         }
+        return node;
+
     }
+
     // RelOp  < | <= | > | >=
     private boolean relOp() {
-        return currentToken.getValue().equals("<=") || currentToken.getValue().equals("<") || currentToken.getValue().equals(">=");
+        return currentToken.getValue().equals("<=") || currentToken.getValue().equals("<") || currentToken.getValue().equals(">") || currentToken.getValue().equals(">=");
     }
     //   Addition Term { AddOp Term }
 
-    private void addition() {
-        term();
+    private ParsingTree.Node addition() {
+        ParsingTree.Node node = new ParsingTree.Node("addition");
+        node.add(term());
         while (addOp()) {
-            match(TokenType.Operator);
-            term();
+            node.add(match(TokenType.Operator));
+            node.add(term());
         }
+        return node;
     }
     //   AddOp   + | -
 
@@ -210,13 +265,16 @@ public class Parser {
 //   Term  Factor { MulOp Factor }
 
 
-    private void term() {
-        factor();
+    private ParsingTree.Node term() {
+        ParsingTree.Node node = new ParsingTree.Node("term");
+        node.add(factor());
         while (mulOp()) {
-            match(TokenType.Operator);
-            factor();
+            node.add(match(TokenType.Operator));
+            node.add(factor());
         }
+        return node;
     }
+
     //   MulOp  * | / | %
     private boolean mulOp() {
         return currentToken.getValue().equals("*") || currentToken.getValue().equals("/") || currentToken.getValue().equals("%");
@@ -224,68 +282,90 @@ public class Parser {
     //  Factor  [ UnaryOp ] Primary
 
 
-    private void factor() {
+    private ParsingTree.Node factor() {
+        ParsingTree.Node node = new ParsingTree.Node("factor");
+        ParsingTree.Node unaryNode=null;
         if (unaryOp()) {
-            match(TokenType.Operator);
+            unaryNode=new ParsingTree.Node("unaryOP");
+            unaryNode.add(match(TokenType.Operator));
+
         }
-        primary();
+        if(unaryNode!=null){
+            unaryNode.add(primary());
+            node.add(unaryNode);
+        }
+        else
+            node.add(primary());
+        return node;
     }
 
     //  Primary   Identifier [ [Expression] ] | Literal | ( Expression ) | Type ( Expression)
-    private void primary() {
+    private ParsingTree.Node primary() {
+        ParsingTree.Node node = new ParsingTree.Node("primary");
         switch (currentToken.getType()) {
             case Identifier:
-                match(TokenType.Identifier);
+                node.add(match(TokenType.Identifier));
                 if (currentToken.getValue().equals("[")) {
-                    match(TokenType.Parenthese);
-                    expression();
-                    match("]");
+                    node.add(match(TokenType.Parenthese));
+                    node.add(expression());
+                    node.add(match("]"));
 
                 }
                 break;
             case Parenthese:
-                if (currentToken.getType().equals("(")) {
-                    match("(");
-                    expression();
-                    match(")");
+                if (currentToken.getValue().equals("(")) {
+                    node.add(match("("));
+                    node.add(expression());
+                    node.add(match(")"));
                 } else
                     showError();
                 break;
             case TypeSpecifier:
-                match(TokenType.TypeSpecifier);
-                match("(");
-                expression();
-                match(")");
+                node.add(match(TokenType.TypeSpecifier));
+                node.add(match("("));
+                node.add(expression());
+                node.add(match(")"));
                 break;
             case Literal:
-                match(TokenType.Literal);
+                node.add(match(TokenType.Literal));
                 break;
             default:
                 showError();
         }
+        return node;
     }
+
     // UnaryOP  - | !
     private boolean unaryOp() {
         return currentToken.getValue().equals("-") || currentToken.getValue().equals("!");
     }
 
-    private void match(String expected) {
-        if (expected.equals(currentToken.getValue()))
+    private ParsingTree.Node match(String expected) {
+        ParsingTree.Node node = null;
+        if (expected.equals(currentToken.getValue())) {
+            node = new ParsingTree.Node(currentToken.toString(), currentToken);
             currentToken = tokenes.poll();
-        else
+
+        } else
             showError();
+        return node;
 
     }
 
-    private void match(TokenType type) {
-        if (type == currentToken.getType())
+    private ParsingTree.Node match(TokenType type) {
+        ParsingTree.Node node = null;
+        if (type == currentToken.getType()) {
+            node = new ParsingTree.Node(currentToken.toString(), currentToken);
             currentToken = tokenes.poll();
-        else
+        } else
             showError();
+        return node;
     }
 
     private void showError() {
         System.out.println("Parser Couldn't finish error \n at line :: " + currentToken.getLine() + "\n in --> " + currentToken.getValue());
         exit(1);
     }
+
+
 }

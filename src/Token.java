@@ -2,6 +2,7 @@
  * Created by BE on 11/23/2016.
  */
 enum TokenType {Reserved, Operator, Literal, Identifier, Parenthese, SpecialSymbol, TypeSpecifier, Invalid,EOF}
+
 public class Token {
 
     TokenType type;
@@ -23,7 +24,7 @@ public class Token {
         this.line=line;
     }
     public String toString(){
-        return value +" " +type ;
+        return value ;
 
     }
     public int getLine(){

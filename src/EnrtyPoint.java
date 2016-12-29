@@ -23,7 +23,9 @@ public class EnrtyPoint {
         }
 
         tokensScanner.startScanning(file); //start scanning
-        parser.startParsing(tokensScanner.getTokenes());
+        System.out.println(tokensScanner.getTokenes());
+        (new SemanticsAnalyzer(parser.startParsing(tokensScanner.getTokenes()))).startAnalyzer();
+
         //tokensScanner.printLists();
 
     }
