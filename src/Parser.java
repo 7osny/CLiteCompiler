@@ -23,13 +23,7 @@ public class Parser {
         if (currentToken.getType() == TokenType.EOF) {
             System.out.println("Parsing has finished successfully....");
         }
-        node.display();
-      //  System.out.println(ParsingTree.getLeafNodes(node));
-       // System.out.println(ParsingTree.getNodes(node,"deceleration"));
         ParsingTree pt = new ParsingTree(node);
-//        SemanticsAnalyzer sa=new SemanticsAnalyzer(pt);
-//        sa.declaration(ParsingTree.getNodes(node,"deceleration").get(0));
-//        sa.declaration(ParsingTree.getNodes(node,"deceleration").get(1));
         return pt;
     }
 
@@ -59,26 +53,43 @@ public class Parser {
     }
 
     //Declaration  Type Identifier [ [ Integer ] ] { , Identifier [ [ Integer ] ] ; }
-    //Declaration  Type Identifier { , Identifier } ;
+
     private ParsingTree.Node deceleration() {
         ParsingTree.Node node = new ParsingTree.Node("deceleration");
         node.add(match(TokenType.TypeSpecifier));
         node.add(match(TokenType.Identifier));
-        while (currentToken.getValue().equals(",")) {
-            node.add(match(","));
-            node.add(match(TokenType.Identifier));
-            if (currentToken.getType() == TokenType.Parenthese) {
+        if (currentToken.getValue().equals("[")) {
+            matchArray(node);
+            while (currentToken.getValue().equals(",")){
+                node.add(match(","));
+                node.add(match(TokenType.Identifier));
+                matchArray(node);
+            }
+        } else {
+            while (currentToken.getValue().equals(",")) {
+                node.add(match(","));
+                node.add(match(TokenType.Identifier));
+                if (currentToken.getType() == TokenType.Parenthese) {
 
-                node.add(match("["));
-                if (TokensScanner.checkInteger(currentToken.getValue()))
-                    node.add(match(TokenType.Literal));
-                else
-                    showError();
-                node.add(match("]"));
+                    node.add(match("["));
+                    if (TokensScanner.checkInteger(currentToken.getValue()))
+                        node.add(match(TokenType.Literal));
+                    else
+                        showError();
+                    node.add(match("]"));
+                }
             }
         }
         node.add(match(";"));
         return node;
+    }
+
+    private void matchArray(ParsingTree.Node node) {
+        node.add(match("["));
+        if (!TokensScanner.checkInteger(currentToken.getValue()))
+            showError();
+        node.add(match(TokenType.Literal));
+        node.add(match("]"));
     }
     //  Statements  {  Statement  }
 
@@ -177,7 +188,7 @@ public class Parser {
         node.add(expression());
         node.add(match(")"));
         node.add(statement());
-        if (currentToken.getValue().equals( "else")) {
+        if (currentToken.getValue().equals("else")) {
             node.add(match("else"));
             node.add(statement());
         }
@@ -213,7 +224,7 @@ public class Parser {
         node.add(relation());
 
         if (equOp()) {
-            ParsingTree.Node eqNode=new ParsingTree.Node(("equOp"));
+            ParsingTree.Node eqNode = new ParsingTree.Node(("equOp"));
             eqNode.add(match(TokenType.Operator));
             node.add(eqNode);
             node.add(relation());
@@ -232,7 +243,7 @@ public class Parser {
         ParsingTree.Node node = new ParsingTree.Node("relation");
         node.add(addition());
         if (relOp()) {
-            ParsingTree.Node relNode=new ParsingTree.Node(("relOp"));
+            ParsingTree.Node relNode = new ParsingTree.Node(("relOp"));
             relNode.add(match(TokenType.Operator));
             node.add(relNode);
             node.add(addition());
@@ -284,17 +295,16 @@ public class Parser {
 
     private ParsingTree.Node factor() {
         ParsingTree.Node node = new ParsingTree.Node("factor");
-        ParsingTree.Node unaryNode=null;
+        ParsingTree.Node unaryNode = null;
         if (unaryOp()) {
-            unaryNode=new ParsingTree.Node("unaryOP");
+            unaryNode = new ParsingTree.Node("unaryOP");
             unaryNode.add(match(TokenType.Operator));
 
         }
-        if(unaryNode!=null){
+        if (unaryNode != null) {
             unaryNode.add(primary());
             node.add(unaryNode);
-        }
-        else
+        } else
             node.add(primary());
         return node;
     }

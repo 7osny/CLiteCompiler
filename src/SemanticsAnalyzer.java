@@ -32,23 +32,20 @@ public class SemanticsAnalyzer {
             ifStatment(ifstatement);
         for (ParsingTree.Node whileStat:whiles)
             whileStatement(whileStat);
-        System.out.println("Semantics Analysis finished successfully...");
+        System.out.println("Semantics Analysis has finished successfully...");
     }
    //this function is responsible to add new variables to symbol table
     public void declaration(ParsingTree.Node declarationNode){
-        ArrayList<ParsingTree.Node> terminals=ParsingTree.getLeafNodes(declarationNode);
+        ArrayList<ParsingTree.Node> ids=ParsingTree.getNodes(declarationNode,TokenType.Identifier);
         LITERAL_TYPE var_type=null;
-        var_type = convertTypeSpecifier( terminals.get(0).getName());
-
-        for(int i=1;i<terminals.size();i++){
-           if(Symbol_Table.containsKey(terminals.get(i).getName()))
-               showError(Not_Uniqe_EXC,terminals.get(0).getToken());
-           else if(! (terminals.get(i).getName().equals(";")
-                     ||terminals.get(i).getName().equals(",")))
-               Symbol_Table.put(terminals.get(i).getName(),var_type);
+        var_type = convertTypeSpecifier( ParsingTree.getNodes(declarationNode,TokenType.TypeSpecifier).get(0).getToken().getValue());
+        for(int i=0;i<ids.size();i++){
+           if(Symbol_Table.containsKey(ids.get(i).getToken().getValue()))
+               showError(Not_Uniqe_EXC,ids.get(i).getToken());
+            Symbol_Table.put(ids.get(i).getToken().getValue(),var_type);
 
        }
-        System.out.print(Symbol_Table);
+     //   System.out.print(Symbol_Table);
     }
 
     private LITERAL_TYPE convertTypeSpecifier(String str) {

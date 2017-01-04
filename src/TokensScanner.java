@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import static com.sun.org.apache.xalan.internal.xsltc.compiler.sym.error;
 import static java.lang.System.exit;
 
 public class TokensScanner {
@@ -28,13 +29,14 @@ public class TokensScanner {
      ArrayList<String> resultingBools = new ArrayList<>();
      ArrayList<String> resultingLiterals = new ArrayList<>();
      ArrayList<Token> tokenes = new ArrayList<>();
+    private boolean errorBol;
 
 
     public void startScanning(File file) throws FileNotFoundException {
         initializeThings();
         lineNum=1;
         Scanner input = new Scanner(file);
-
+        String str="";
         while (input.hasNext()) {
             ArrayList<String> arr = new ArrayList<>(Arrays.asList(input.nextLine().split(" ")));
             for (int i = 0; i < arr.size(); i++) {
@@ -95,8 +97,22 @@ public class TokensScanner {
             }
         }*/
 
+           for(int i=0;i<tokenes.size();i++){
+               if(tokenes.get(i).getType()==TokenType.Invalid){
+                   System.out.println("Lexical Analysis error at Line "+tokenes.get(i).getLine()+" wrong symbol "+tokenes.get(i).getValue().toString());
+                   errorBol=true;
+                   return;
+               }
+
+
+           }
         System.out.println("Lexical Analysis has finished successfully...");
 
+
+
+    }
+    public Boolean errorExist(){
+        return errorBol;
     }
    public ArrayList<Token> getTokenes(){
        return  tokenes;

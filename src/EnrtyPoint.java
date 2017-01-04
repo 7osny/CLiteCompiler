@@ -13,8 +13,9 @@ public class EnrtyPoint {
     public static void main(String[] args) throws FileNotFoundException {
         Scanner sysin = new Scanner(System.in);
 
-        System.out.print("Enter Src file path :: ");
-        String path = sysin.nextLine();
+       // System.out.print("Enter Src file path :: ");
+       // String path = sysin.nextLine();
+        String path="f:\\src.txt";
         //if(new File(path))
         File file = new File(path);
         if (!file.exists()) {
@@ -23,10 +24,11 @@ public class EnrtyPoint {
         }
 
         tokensScanner.startScanning(file); //start scanning
-        System.out.println(tokensScanner.getTokenes());
-        (new SemanticsAnalyzer(parser.startParsing(tokensScanner.getTokenes()))).startAnalyzer();
-
-        //tokensScanner.printLists();
+        if(tokensScanner.errorExist())
+            System.exit(1);
+        ParsingTree parsingTree=parser.startParsing(tokensScanner.getTokenes());
+        SemanticsAnalyzer semanticsAnalyzer=new SemanticsAnalyzer(parsingTree);
+        semanticsAnalyzer.startAnalyzer();
 
     }
 

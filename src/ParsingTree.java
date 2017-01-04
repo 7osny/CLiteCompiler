@@ -55,7 +55,7 @@ public class ParsingTree {
     public static class Node{
         String name;
         Token token;
-
+        ArrayList<Node> childs=new ArrayList<>();
         public ArrayList<Node> getChilds() {
             return childs;
         }
@@ -80,7 +80,7 @@ public class ParsingTree {
             this.token = token;
         }
 
-        ArrayList<Node> childs=new ArrayList<>();
+
         public Node(String name){
             this.name=name;
 
