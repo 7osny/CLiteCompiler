@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/TokensScanner.iml" filepath="$PROJECT_DIR$/TokensScanner.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CLITEGUI.iml" filepath="$PROJECT_DIR$/CLITEGUI.iml" />
     </modules>
   </component>
 </project>

@@ -1,3 +1,5 @@
+package sample.src;
+
 /**
  * Created by BE on 11/23/2016.
  */
@@ -18,7 +20,7 @@ public class Token {
         return value;
     }
 
-    public Token(TokenType type, String value,int line) {
+    public Token(TokenType type, String value, int line) {
         this.type = type;
         this.value = value;
         this.line=line;

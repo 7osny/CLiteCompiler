@@ -1,9 +1,10 @@
-
+package sample.src;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import static java.lang.System.err;
 import static java.lang.System.exit;
 
 /**
@@ -12,7 +13,12 @@ import static java.lang.System.exit;
 public class Parser {
     Queue<Token> tokenes;
     Token currentToken;
+    String errorMsg="Parsing has finished successfully....";
+    private boolean errorBol;
 
+    public boolean getErrorBol(){
+        return errorBol;
+    }
     public ParsingTree startParsing(ArrayList<Token> resultingTokens) {
         tokenes = new LinkedList<>(resultingTokens);
         currentToken = tokenes.poll();
@@ -374,7 +380,14 @@ public class Parser {
 
     private void showError() {
         System.out.println("Parser Couldn't finish error \n at line :: " + currentToken.getLine() + "\n in --> " + currentToken.getValue());
-        exit(1);
+        if(!errorBol){
+            errorBol=true;
+            errorMsg="Parser Couldn't finish error \n at line :: " + currentToken.getLine() + "\n in --> " + currentToken.getValue();
+        }
+       // exit(1);
+    }
+    public String getErrorMsg(){
+        return errorMsg;
     }
 
 

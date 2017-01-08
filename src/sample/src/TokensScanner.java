@@ -1,12 +1,10 @@
+package sample.src;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
-
-import static com.sun.org.apache.xalan.internal.xsltc.compiler.sym.error;
-import static java.lang.System.exit;
 
 public class TokensScanner {
 
@@ -373,5 +371,86 @@ public class TokensScanner {
         if ((ch <= 'Z' && ch >= 'A') || ((ch <= 'z' && ch >= 'a')))
             return true;
         return false;
+    }
+
+    public String startScanning(String source) {
+        initializeThings();
+        lineNum = 1;
+        //Scanner input = new Scanner(file);
+        String str = "";
+        Character ch='\n';
+        String[] arrStr = source.split(ch.toString());
+        for (int counttt = 0; counttt < arrStr.length; counttt++) {
+            ArrayList<String> arr = new ArrayList<>(Arrays.asList(arrStr[counttt].split(" ")));
+            for (int i = 0; i < arr.size(); i++) {
+                if (checkFloat(arr.get(i))) {
+                    //  resultingfloats.add(arr.get(i));
+                    addInProberList(arr.get(i), TokenType.Literal);
+                } else if (checkBoolean(arr.get(i))) {
+                    // resultingBools.add(arr.get(i));
+                    addInProberList(arr.get(i), TokenType.Literal);
+
+                } else if (checkInteger(arr.get(i))) {
+                    //resultingints.add(arr.get(i));
+                    addInProberList(arr.get(i), TokenType.Literal);
+                } else if (specialSymbols.indexOf(arr.get(i)) >= 0) {
+                    // resultingspecialChars.add(arr.get(i));
+                    addInProberList(arr.get(i), TokenType.SpecialSymbol);
+
+                } else if (checkChar(arr.get(i))) {
+                    // resultingChars.add(arr.get(i));
+                    addInProberList(arr.get(i), TokenType.Literal);
+
+                } else if (reservedWords.indexOf(arr.get(i)) >= 0) {
+                    // resultingreserved.add(arr.get(i));
+                    addInProberList(arr.get(i), TokenType.Reserved);
+
+                } else if (typeSpecifiers.indexOf(arr.get(i)) >= 0) {
+                    addInProberList(arr.get(i), TokenType.TypeSpecifier);
+
+                } else if (operators.indexOf(arr.get(i)) >= 0) {
+                    // resultingops.add(arr.get(i));
+                    addInProberList(arr.get(i), TokenType.Operator);
+
+                } else if (parenthes.indexOf(arr.get(i)) >= 0) {
+                    // resultingParenthese.add(arr.get(i));
+                    addInProberList(arr.get(i), TokenType.Parenthese);
+
+                } else {
+                    String word = arr.get(i);
+                    longestMatch(word);
+                }
+            }
+            lineNum++;
+        }
+
+        tokenes.add(new Token(TokenType.EOF,"",lineNum));
+
+  /*      for (int i = 0; i < resultingInvadlidTokens.size(); i++) {
+            String str = resultingInvadlidTokens.get(i);
+            if (checkFloat(str)) {
+                resultingfloats.add(str);
+                resultingInvadlidTokens.remove(str);
+                i--;
+            } else if (checkInteger(str)) {
+                resultingints.add(str);
+                resultingInvadlidTokens.remove(str);
+                i--;
+
+            }
+        }*/
+
+        for(int i=0;i<tokenes.size();i++){
+            if(tokenes.get(i).getType()==TokenType.Invalid){
+
+                errorBol=true;
+                return "Lexical Analysis error at Line "+tokenes.get(i).getLine()+" wrong symbol "+tokenes.get(i).getValue().toString();
+            }
+
+
+        }
+        return "Lexical Analysis has finished successfully...";
+
+
     }
 }

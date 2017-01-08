@@ -1,3 +1,5 @@
+package sample.src;
+
 import java.util.ArrayList;
 
 /**
@@ -9,7 +11,7 @@ public class ParsingTree {
         root=node;
     }
     public static ArrayList<Node> getLeafNodes(Node node){
-        ArrayList<Node>leafs=new ArrayList<>();
+        ArrayList<Node> leafs=new ArrayList<>();
         if(node.getChilds().size()==0){
             leafs.add(node);
             return leafs;
@@ -21,7 +23,7 @@ public class ParsingTree {
         }
         return leafs;
     }
-    public static ArrayList<Node> getNodes(Node node,String nodeName){
+    public static ArrayList<Node> getNodes(Node node, String nodeName){
         ArrayList<Node> nodes=new ArrayList<>();
         if(node.getName().equalsIgnoreCase(nodeName)){
             nodes.add(node);
@@ -35,7 +37,7 @@ public class ParsingTree {
         return nodes;
 
     }
-    public static ArrayList<Node> getNodes(Node node,TokenType type){
+    public static ArrayList<Node> getNodes(Node node, TokenType type){
         ArrayList<Node> nodes=new ArrayList<>();
         if(node.getToken()!=null&&node.getToken().getType()==type){
             nodes.add(node);
@@ -85,7 +87,7 @@ public class ParsingTree {
             this.name=name;
 
         }
-        public Node(String name,Token type){
+        public Node(String name, Token type){
             this.name=name;
             this.token=type;
 

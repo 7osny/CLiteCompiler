@@ -1,3 +1,5 @@
+package sample.src;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -9,6 +11,17 @@ public class SemanticsAnalyzer {
     final String Not_Declared_EXC="Cannot find symbol";
     final String Invalid_Type_EXC="Incompatible types";
     final String Invalid_Boolean_EXC="incompatible types: this type cannot be converted to boolean";
+    private boolean errorBol=false;
+    private String errorMsg="Semantics Analysis has finished successfully...";
+
+    public boolean getErrorBol() {
+        return errorBol;
+    }
+
+    public String getErrorMsg() {
+        return errorMsg;
+    }
+
     enum LITERAL_TYPE{INT,FLOAT,CHAR,BOOL;};
     ParsingTree parsingTree;
     int whichLine=0;
@@ -62,7 +75,7 @@ public class SemanticsAnalyzer {
     }
 
     public LITERAL_TYPE getExpressionLiteralType(ParsingTree.Node node){
-        ArrayList<ParsingTree.Node>terminals=ParsingTree.getLeafNodes(node);
+        ArrayList<ParsingTree.Node> terminals=ParsingTree.getLeafNodes(node);
           if(ParsingTree.getNodes(node,"equOp").size()>0 ||ParsingTree.getNodes(node,"relOp").size()>0
                   ||terminals.contains("&&")||terminals.contains("||")) {
               checkBoolExpValidity(node);
@@ -72,8 +85,8 @@ public class SemanticsAnalyzer {
     }
     public LITERAL_TYPE getArithmeticLiteralType(ParsingTree.Node node){
      //   LITERAL_TYPE ex_type=null;
-        ArrayList<ParsingTree.Node>prims=ParsingTree.getNodes(node,"primary");
-        ArrayList<LITERAL_TYPE>primsLiteralType=new ArrayList<>();
+        ArrayList<ParsingTree.Node> prims=ParsingTree.getNodes(node,"primary");
+        ArrayList<LITERAL_TYPE> primsLiteralType=new ArrayList<>();
         for(ParsingTree.Node unary:ParsingTree.getNodes(node,"unaryOP")){
             checkUnaryValidity(unary);
             primsLiteralType.add(LITERAL_TYPE.BOOL);
@@ -87,8 +100,8 @@ public class SemanticsAnalyzer {
         }
         for(ParsingTree.Node pr:prims){
 
-            ArrayList<ParsingTree.Node>ids=ParsingTree.getNodes(pr,TokenType.Identifier);
-            ArrayList<ParsingTree.Node>literals=ParsingTree.getNodes(pr,TokenType.Literal);
+            ArrayList<ParsingTree.Node> ids=ParsingTree.getNodes(pr,TokenType.Identifier);
+            ArrayList<ParsingTree.Node> literals=ParsingTree.getNodes(pr,TokenType.Literal);
             if(ids.size()!=0){
                 whichLine=ids.get(0).getToken().getLine();
                 for(int i=0;i<ids.size();i++){
@@ -108,17 +121,17 @@ public class SemanticsAnalyzer {
     }
 
     private void checkUnaryValidity(ParsingTree.Node unary) {
-        ArrayList<ParsingTree.Node>primes=ParsingTree.getNodes(unary,"primary");
+        ArrayList<ParsingTree.Node> primes=ParsingTree.getNodes(unary,"primary");
         ParsingTree.Node node=new ParsingTree.Node("TestUnaryPrimes");
         node.setChilds(primes);
 
-        if(getExpressionLiteralType(node)!=LITERAL_TYPE.BOOL){
+        if(getExpressionLiteralType(node)!= LITERAL_TYPE.BOOL){
             showError(Invalid_Boolean_EXC);
         }
     }
 
     private void checkBoolExpValidity(ParsingTree.Node node){
-        ArrayList<ParsingTree.Node>conjunctions=ParsingTree.getNodes(node,"conjunction");
+        ArrayList<ParsingTree.Node> conjunctions=ParsingTree.getNodes(node,"conjunction");
         for(ParsingTree.Node con:conjunctions) {
 
             ArrayList<ParsingTree.Node> equalities = ParsingTree.getNodes(con, "equality");
@@ -155,19 +168,19 @@ public class SemanticsAnalyzer {
         return  null;
     }
     private void ifStatment(ParsingTree.Node node){
-        if(getExpressionLiteralType(ParsingTree.getNodes(node,"expression").get(0))!=LITERAL_TYPE.BOOL)
+        if(getExpressionLiteralType(ParsingTree.getNodes(node,"expression").get(0))!= LITERAL_TYPE.BOOL)
                  showError(Invalid_Boolean_EXC);
         for(ParsingTree.Node var:ParsingTree.getNodes(node,TokenType.Identifier))
             checkVariableExistence(var.getName(),var.getToken());
     }
     private void whileStatement(ParsingTree.Node node){
-        if(getExpressionLiteralType(ParsingTree.getNodes(node,"expression").get(0))!=LITERAL_TYPE.BOOL)
+        if(getExpressionLiteralType(ParsingTree.getNodes(node,"expression").get(0))!= LITERAL_TYPE.BOOL)
             showError(Invalid_Boolean_EXC);
         for(ParsingTree.Node var:ParsingTree.getNodes(node,TokenType.Identifier))
            checkVariableExistence(var.getName(),var.getToken());
     }
     private void assignment(ParsingTree.Node node){
-        ArrayList<ParsingTree.Node>ids=ParsingTree.getNodes(node,TokenType.Identifier);
+        ArrayList<ParsingTree.Node> ids=ParsingTree.getNodes(node,TokenType.Identifier);
         for(ParsingTree.Node var:ids)
             checkVariableExistence(var.getName(),var.getToken());
         String id=ParsingTree.getNodes(node,TokenType.Identifier).get(0).getName();
@@ -183,10 +196,10 @@ public class SemanticsAnalyzer {
     public boolean compatable(LITERAL_TYPE target,LITERAL_TYPE source ) {
         if(target==source)
             return true;
-       if(target==LITERAL_TYPE.FLOAT&&(source==LITERAL_TYPE.INT
-               ||source==LITERAL_TYPE.CHAR))
+       if(target== LITERAL_TYPE.FLOAT&&(source== LITERAL_TYPE.INT
+               ||source== LITERAL_TYPE.CHAR))
            return true;
-       if(target==LITERAL_TYPE.INT&&source==LITERAL_TYPE.CHAR)
+       if(target== LITERAL_TYPE.INT&&source== LITERAL_TYPE.CHAR)
            return true;
        return false;
     }
@@ -209,13 +222,19 @@ public class SemanticsAnalyzer {
         return null;
 
     }
-    public void showError(String str,Token token){
-        System.out.println("Semantics Error at line ( "+token.line+" ) ::: "+str);
-        System.exit(1);
+    public void showError(String str, Token token){
+        if(!errorBol){
+        errorMsg="Semantics Error at line ( "+token.line+" ) ::: "+str;
+        errorBol=true;
+        }
+
     }
     public void showError(String str){
-        System.out.println("Semantics Error at line ( "+whichLine+" ) ::: "+str);
-        System.exit(1);
+        if(!errorBol){
+            errorMsg="Semantics Error at line ( "+whichLine+" ) ::: "+str;
+            errorBol=true;
+        }
+
     }
 
 }
